@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -14,12 +18,13 @@ var _Link2 = _interopRequireDefault(_Link);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var getName = function getName(pathname) {
+var getHref = function getHref(pathname) {
   // /web
   var name = pathname.split('/')[1];
   // /web.html
   name = name.split('.')[0];
-  return name;
+  var ext = _path2.default.extname(pathname);
+  return name + '/peanut' + ext;
 };
 
 var WebIndexRoute = function WebIndexRoute(props) {
@@ -49,7 +54,7 @@ var WebIndexRoute = function WebIndexRoute(props) {
       null,
       _react2.default.createElement(
         _Link2.default,
-        { to: '/' + getName(props.location.pathname) + '/peanut.html' },
+        { to: '/' + getHref(props.location.pathname) },
         'PeaNut'
       )
     ),

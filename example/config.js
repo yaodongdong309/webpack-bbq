@@ -6,6 +6,5 @@ const basedir = __dirname;
 module.exports = {
   basedir: basedir,
   outputdir: basedir + '/public',
-  // rootdir: '/public/',
-  rootdir: '/', // staticRendering
+  rootdir: '/',
 };

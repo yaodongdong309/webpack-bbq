@@ -1,6 +1,6 @@
 {
   "name": "webpack-bbq",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "webpack your bbq",
   "main": "index.js",
   "scripts": {
@@ -43,6 +43,7 @@
     "xhr-request": "^1.0.1"
   },
   "dependencies": {
+    "clear-require-cache": "^1.0.0",
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.1.2",
     "babel-plugin-transform-ensure-ignore": "^0.1.0",
