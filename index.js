@@ -122,7 +122,12 @@ const bbq = (config) => (client, server) => {
   ];
   if (process.env.NODE_ENV === 'production') {
     plugins.push(new webpack.optimize.DedupePlugin());
-    plugins.push(new webpack.optimize.UglifyJsPlugin());
+    plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true));
+    plugins.push(new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false
+      },
+    }));
   }
 
   // configuration - plugins
