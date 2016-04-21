@@ -71,6 +71,9 @@ function renderToString(store, router) {
   .concat([
     `<script>window[${JSON.stringify(appName)}](${JSON.stringify(store.getState())});</script>`,
   ]);
+  if (process.env.NODE_ENV === 'development') {
+    javascripts.push(`<script src="/webpack-dev-server.js}"></script>`);
+  }
 
   const html = `<!doctype html>
 <html>

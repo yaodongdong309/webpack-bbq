@@ -107,6 +107,9 @@ function renderToString(store, router) {
   var javascripts = ['<script src="' + _config2.default.rootdir + revisions[appName + '.js'] + '"></script>'].concat(chunkNames.map(function (chunkName) {
     return '<script src="' + _config2.default.rootdir + revisions[chunkName + '.js'] + '"></script>';
   })).concat(['<script>window[' + JSON.stringify(appName) + '](' + JSON.stringify(store.getState()) + ');</script>']);
+  if (process.env.NODE_ENV === 'development') {
+    javascripts.push('<script src="/webpack-dev-server.js}"></script>');
+  }
 
   var html = '<!doctype html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <title>webpack-bbq</title>\n    ' + stylesheets.join('\n    ') + '\n  </head>\n  <body>\n    <div id="' + appName + '">' + appHtml + '</div>\n    ' + javascripts.join('\n    ') + '\n  </body>\n</html>\n  ';
   return html;
