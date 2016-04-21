@@ -57,10 +57,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var rootReducer = (0, _redux.combineReducers)(_reducers2.default);
 var storeEnhancer = (0, _redux.applyMiddleware)(_reduxThunk2.default);
 var revisions = require('../app-revisions.json');
-var appName = expose(require.resolve('../src/'), _config2.default.basedir + '/src/');
+var appName = expose(require.resolve('../src/client'), _config2.default.basedir + '/src/');
 
 exports.default = function (location, callback) {
-  var initialState = {};
+  var initialState = { appName: appName };
   var store = (0, _redux.createStore)(rootReducer, initialState, storeEnhancer);
 
   (0, _match2.default)({ location: location, routes: _routes2.default }, function (err, redirectLocation, renderProps) {
@@ -108,7 +108,7 @@ function renderToString(store, router) {
     return '<script src="' + _config2.default.rootdir + revisions[chunkName + '.js'] + '"></script>';
   })).concat(['<script>window[' + JSON.stringify(appName) + '](' + JSON.stringify(store.getState()) + ');</script>']);
   if (process.env.NODE_ENV === 'development') {
-    javascripts.push('<script src="/webpack-dev-server.js}"></script>');
+    javascripts.push('<script src="/webpack-dev-server.js"></script>');
   }
 
   var html = '<!doctype html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <title>webpack-bbq</title>\n    ' + stylesheets.join('\n    ') + '\n  </head>\n  <body>\n    <div id="' + appName + '">' + appHtml + '</div>\n    ' + javascripts.join('\n    ') + '\n  </body>\n</html>\n  ';

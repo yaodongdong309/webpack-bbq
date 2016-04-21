@@ -24,12 +24,9 @@ var _reduxThunk = require('redux-thunk');
 
 var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
-var _askForReduxDevTools = require('./askForReduxDevTools');
-
-var _askForReduxDevTools2 = _interopRequireDefault(_askForReduxDevTools);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var askForReduxDevTools = require('./askForReduxDevTools');
 var App = require('./App');
 var routes = require('./routes');
 var reducers = require('./reducers');
@@ -38,13 +35,20 @@ exports.default = function (initialState) {
   var rootReducer = (0, _redux.combineReducers)((0, _xtend2.default)(reducers, {
     routing: _reactRouterRedux.routerReducer
   }));
+
   var store = (0, _redux.createStore)(rootReducer, initialState, (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default, (0, _reactRouterRedux.routerMiddleware)(history)),
   // https://github.com/zalmoxisus/redux-devtools-extension
   // https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
-  window.devToolsExtension ? window.devToolsExtension() : _askForReduxDevTools2.default));
+  window.devToolsExtension ? window.devToolsExtension() : askForReduxDevTools));
+
   var history = (0, _reactRouterRedux.syncHistoryWithStore)(_browserHistory2.default, store);
   var router = { history: history, routes: routes };
-  return (0, _reactDom.render)((0, _react.createElement)(App, { store: store, router: router }), document.getElementById(store.getState().appName));
+
+  var el = (0, _react.createElement)(App, { store: store, router: router });
+  var domEl = document.getElementById(store.getState().appName);
+  var rendered = (0, _reactDom.render)(el, domEl);
+
+  return rendered;
 };
 
 module.exports = exports['default'];

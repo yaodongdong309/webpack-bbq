@@ -16,10 +16,10 @@ import getChunkNames from './getChunkNames';
 const rootReducer = combineReducers(reducers);
 const storeEnhancer = applyMiddleware(thunkMiddleware);
 const revisions = require('../app-revisions.json');
-const appName = expose(require.resolve('../src/'), `${config.basedir}/src/`);
+const appName = expose(require.resolve('../src/client'), `${config.basedir}/src/`);
 
 export default (location, callback) => {
-  const initialState = {};
+  const initialState = { appName };
   const store = createStore(rootReducer, initialState, storeEnhancer);
 
   match({ location, routes }, (err, redirectLocation, renderProps) => {
@@ -72,7 +72,7 @@ function renderToString(store, router) {
     `<script>window[${JSON.stringify(appName)}](${JSON.stringify(store.getState())});</script>`,
   ]);
   if (process.env.NODE_ENV === 'development') {
-    javascripts.push(`<script src="/webpack-dev-server.js}"></script>`);
+    javascripts.push(`<script src="/webpack-dev-server.js"></script>`);
   }
 
   const html = `<!doctype html>
