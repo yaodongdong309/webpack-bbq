@@ -1,6 +1,6 @@
 {
-  "index.js": "index.bundle.js",
-  "index.css": "index.bundle.css",
+  "client.js": "client.bundle.js",
+  "client.css": "client.bundle.css",
   "web.js": "web.bundle.js",
   "peanut.js": "peanut.bundle.js",
   "m.js": "m.bundle.js",

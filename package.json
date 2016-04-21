@@ -1,6 +1,6 @@
 {
   "name": "webpack-bbq",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "webpack your bbq",
   "main": "index.js",
   "scripts": {
@@ -29,8 +29,8 @@
     "http-hash-router": "^1.1.0",
     "lodash": "^4.11.1",
     "postcss-nesting": "^2.3.1",
-    "react": "^0.14.8",
-    "react-dom": "^0.14.8",
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1",
     "react-redux": "^4.4.2",
     "react-router": "^2.0.1",
     "react-router-redux": "^4.0.2",
@@ -40,6 +40,7 @@
     "send-data": "^8.0.0",
     "st": "^1.1.0",
     "tape": "^4.5.1",
+    "webpack-dev-server": "^1.14.1",
     "xhr-request": "^1.0.1"
   },
   "dependencies": {

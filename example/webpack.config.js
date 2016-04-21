@@ -7,7 +7,7 @@ module.exports = require('../')({
   outputdir: config.outputdir,
   publicPath: config.rootdir,
 })({
-  entry: { index: './src/' },
+  entry: { client: './src/client' },
   postcss: () => [require('postcss-nesting')],
 }, {
   entry: './src/server',

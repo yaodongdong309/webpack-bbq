@@ -344,13 +344,13 @@ StaticRendering.prototype.apply = function (compiler) {
 
     map(self.server.staticRendering, (pathname, cb) => {
       const filepath = `${config.outputdir}${pathname}`;
-      mkdirp(path.dirname(filepath), (err) => {
+      compiler.outputFileSystem.mkdirp(path.dirname(filepath), (err) => {
         if (err) return cb(err);
         app(pathname, (err, html) => {
           if (err) return cb(err);
           const relpath = path.relative(self.config.outputdir, filepath);
           logs.push(['StaticRendering', `/${relpath}`]);
-          fs.writeFile(filepath, html, cb);
+          compiler.outputFileSystem.writeFile(filepath, html, cb);
         });
       });
     }, done);

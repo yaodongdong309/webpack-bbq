@@ -1,8 +1,12 @@
+'use strict';
 const sendHtml = require('send-data/html');
 
-const app = require('../lib/server');
+let app = null; // lazy
 
 module.exports = (req, res, opts, cb) => {
+  if (app === null) {
+    app = require('../lib/server');
+  }
   app(req.url, (err, html) => {
     if (err) {
       return cb(err);
