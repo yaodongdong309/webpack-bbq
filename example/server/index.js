@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'production') {
     console.info(`server is listening at ${JSON.stringify(this.address())}`);
   });
 } else {
-  server.listen(port + 1, function() {
+  server.listen(port + 1, 'localhost', function() {
     console.info(`server is listening at ${JSON.stringify(this.address())}`);
   });
   const WebpackDevServer = require('webpack-dev-server');
@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === 'production') {
     publicPath: config.publicPath,
     stats: statsOptions,
   });
-  devServer.listen(port + 1, 'localhost', function() {
-    console.info(`server is listening at ${JSON.stringify(this.address())}`);
+  devServer.listen(port, 'localhost', function() {
+    console.info(`dev server is listening at ${JSON.stringify(this.address())}`);
   });
 }
