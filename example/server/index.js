@@ -29,8 +29,8 @@ if (process.env.NODE_ENV === 'production') {
     chunkOrigins: false,
     publicPath: true,
   };
-  const libpack = webpack(webpackConfig[1])
-  .watch({}, (err, stats) => {
+  const libpack = webpack(webpackConfig[1]);
+  libpack.watch({}, (err, stats) => {
     if (err) console.error(err);
     else console.info(stats.toString(statsOptions));
   });
@@ -43,6 +43,7 @@ if (process.env.NODE_ENV === 'production') {
     publicPath: config.publicPath,
     stats: statsOptions,
   });
+  libpack.outputFileSystem = devServer.middleware.fileSystem;
   devServer.listen(port, 'localhost', function() {
     console.info(`dev server is listening at ${JSON.stringify(this.address())}`);
   });
