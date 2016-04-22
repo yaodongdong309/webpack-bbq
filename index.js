@@ -117,6 +117,7 @@ const bbq = (config) => (client, server) => {
     }),
     new ManifestGeneratorPlugin(`${config.basedir}/app-revisions.json`),
   ];
+
   if (process.env.NODE_ENV === 'production') {
     plugins.push(new webpack.optimize.DedupePlugin());
     plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true));
@@ -281,6 +282,20 @@ const bbq = (config) => (client, server) => {
     serverPlugins.push(new StaticRendering(config, server));
   }
   server.plugins = serverPlugins.concat(server.plugins).filter(v => v);
+
+  if (process.env.NODE_ENV === 'development') {
+    // configuration - recordsPath
+    client.recordsPath = `${config.basedir}/.webpack-hmr-records.json`;
+
+    const hotDevServer = require.resolve('webpack/hot/dev-server');
+    Object
+    .keys(client.entry)
+    .forEach(key => {
+      client.entry[key] = [].concat(client.entry[key]).concat(hotDevServer);
+    });
+
+    client.plugins.push(new webpack.HotModuleReplacementPlugin());
+  }
 
   return [
     client,
