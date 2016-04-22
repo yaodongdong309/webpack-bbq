@@ -18,16 +18,13 @@ const libify = require.resolve('webpack-libify');
 /**
  * config.basedir
  * config.outputdir
+ * config.rootdir
  * config.publicPath
  *
  * client
  * server
  */
 const bbq = (config) => (client, server) => {
-  warning(
-    config.rootdir === undefined,
-    'config.rootdir was deprecated, please use config.publicPath instead'
-  );
   client = defined(client, {});
   server = defined(server, {});
 
@@ -308,7 +305,7 @@ NamedStats.prototype.apply = function(compiler) {
 };
 
 function StaticRendering(config, server) {
-  this.config = config;
+  this.config = xtend({ rootdir: '/' }, config);
   this.server = server;
   this.logger = config.logger || console;
 }
@@ -342,14 +339,13 @@ StaticRendering.prototype.apply = function (compiler) {
       return done(new Error('server.entry MUST BE compatible with the style: (props, cb) => cb(null, html)'));
     }
 
-    map(self.server.staticRendering, (pathname, cb) => {
-      const filepath = `${config.outputdir}${pathname}`;
+    map(self.server.staticRendering, (uri, cb) => {
+      const filepath = `${config.outputdir}${uri.slice(config.rootdir.length - 1)}`;
       compiler.outputFileSystem.mkdirp(path.dirname(filepath), (err) => {
         if (err) return cb(err);
-        app(pathname, (err, html) => {
+        app(uri, (err, html) => {
           if (err) return cb(err);
-          const relpath = path.relative(self.config.outputdir, filepath);
-          logs.push(['StaticRendering', `/${relpath}`]);
+          logs.push(['StaticRendering', uri]);
           compiler.outputFileSystem.writeFile(filepath, html, cb);
         });
       });

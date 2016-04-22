@@ -15,8 +15,8 @@ import getChunkNames from './getChunkNames';
 
 const rootReducer = combineReducers(reducers);
 const storeEnhancer = applyMiddleware(thunkMiddleware);
-const revisions = require('../app-revisions.json');
 const appName = expose(require.resolve('../src/client'), `${config.basedir}/src/`);
+let revisions = null; // lazy
 
 export default (location, callback) => {
   const initialState = { appName };
@@ -33,6 +33,11 @@ export default (location, callback) => {
       const rerr = new Error(`match({ location: ${location} }): renderProps is missing`);
       rerr.statusCode = 404;
       return callback(rerr);
+    }
+
+    // StaticRendering
+    if (path.extname(location) === '.html') {
+      return callback(null, renderToString(store, renderProps));
     }
 
     const components = renderProps.components
@@ -55,18 +60,22 @@ function createRequest(component) {
 }
 
 function renderToString(store, router) {
+  if (revisions === null) {
+    revisions = require('../app-revisions.json');
+  }
+
   const el = createElement(App, { store, router });
   const appHtml = ReactDOMServer.renderToString(el);
 
   const chunkNames = getChunkNames(router.location);
   const stylesheets = [
-    `<link href="${config.rootdir}${revisions[`${appName}.css`]}" rel="stylesheet" />`,
+    `<link href="${config.publicPath}${revisions[`${appName}.css`]}" rel="stylesheet" />`,
   ];
   const javascripts = [
-    `<script src="${config.rootdir}${revisions[`${appName}.js`]}"></script>`,
+    `<script src="${config.publicPath}${revisions[`${appName}.js`]}"></script>`,
   ]
   .concat(chunkNames.map((chunkName) => (
-    `<script src="${config.rootdir}${revisions[`${chunkName}.js`]}"></script>`
+    `<script src="${config.publicPath}${revisions[`${chunkName}.js`]}"></script>`
   )))
   .concat([
     `<script>window[${JSON.stringify(appName)}](${JSON.stringify(store.getState())});</script>`,

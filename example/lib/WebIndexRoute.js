@@ -16,15 +16,17 @@ var _Link = require('react-router/lib/Link');
 
 var _Link2 = _interopRequireDefault(_Link);
 
+var _config = require('../config');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var getHref = function getHref(pathname) {
   // /web
-  var name = pathname.split('/')[1];
+  var name = pathname.slice(_config.rootdir.length).split('/')[0];
   // /web.html
   name = name.split('.')[0];
   var ext = _path2.default.extname(pathname);
-  return name + '/peanut' + ext;
+  return '' + _config.rootdir + name + '/peanut' + ext;
 };
 
 var WebIndexRoute = function WebIndexRoute(props) {
@@ -54,7 +56,7 @@ var WebIndexRoute = function WebIndexRoute(props) {
       null,
       _react2.default.createElement(
         _Link2.default,
-        { to: '/' + getHref(props.location.pathname) },
+        { to: '' + getHref(props.location.pathname) },
         'PeaNut'
       )
     ),

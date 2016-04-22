@@ -9,13 +9,13 @@ const mocker = httpHashMocker([
 ], { basedir: config.basedir });
 
 const router = httpHashRouter();
-router.set('/api/*', mocker);
-router.set('/web', web);
-router.set('/web/*', web);
-router.set('/m', web);
-router.set('/m/*', web);
-router.set('/hare', web);
-router.set('/hare/*', web);
+router.set(`/api/*`, mocker);
+router.set(`${config.rootdir}web`, web);
+router.set(`${config.rootdir}web/*`, web);
+router.set(`${config.rootdir}m`, web);
+router.set(`${config.rootdir}m/*`, web);
+router.set(`${config.rootdir}hare`, web);
+router.set(`${config.rootdir}hare/*`, web);
 router.set(`${config.rootdir}*`, st({
   path: config.outputdir,
   url: config.rootdir,

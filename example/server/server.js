@@ -12,9 +12,15 @@ const server = http.createServer((req, res) => {
     const route = router.hash.get(req.url);
     const clearRequireCache = require('clear-require-cache');
     if ([
-      '/web', '/web.html', '/web/*',
-      '/m', '/m.html', '/m/*',
-      '/hare', '/hare.html', '/hare/*',
+      `${config.rootdir}web`,
+      `${config.rootdir}web.html`,
+      `${config.rootdir}web/*`,
+      `${config.rootdir}m`,
+      `${config.rootdir}m.html`,
+      `${config.rootdir}m/*`,
+      `${config.rootdir}hare`,
+      `${config.rootdir}hare.html`,
+      `${config.rootdir}hare/*`,
     ].indexOf(route.src) !== -1) {
       clearRequireCache(routerpath);
       router = require(routerpath);
@@ -23,7 +29,7 @@ const server = http.createServer((req, res) => {
 
   router(req, res, {}, (err) => {
     if (err) {
-      console.error(err.stack || err.toString());
+      console.error(req.url, err.stack || err.toString());
       if (res.finished) {
         return;
       }

@@ -2,21 +2,17 @@ const path = require('path');
 
 const config = require('./config');
 
-module.exports = require('../')({
-  basedir: config.basedir,
-  outputdir: config.outputdir,
-  publicPath: config.rootdir,
-})({
-  entry: { client: './src/client' },
+module.exports = require('../')(config)({
+  entry: require.resolve('./src/client'),
   postcss: () => [require('postcss-nesting')],
 }, {
-  entry: './src/server',
+  entry: require.resolve('./src/server'),
   staticRendering: [
-    '/web.html',
-    '/m.html',
-    '/hare.html',
-    '/web/peanut.html',
-    '/m/peanut.html',
-    '/hare/peanut.html',
+    `${config.rootdir}web.html`,
+    `${config.rootdir}m.html`,
+    `${config.rootdir}hare.html`,
+    `${config.rootdir}web/peanut.html`,
+    `${config.rootdir}m/peanut.html`,
+    `${config.rootdir}hare/peanut.html`,
   ],
 });

@@ -56,8 +56,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var rootReducer = (0, _redux.combineReducers)(_reducers2.default);
 var storeEnhancer = (0, _redux.applyMiddleware)(_reduxThunk2.default);
-var revisions = require('../app-revisions.json');
 var appName = expose(require.resolve('../src/client'), _config2.default.basedir + '/src/');
+var revisions = null; // lazy
 
 exports.default = function (location, callback) {
   var initialState = { appName: appName };
@@ -74,6 +74,11 @@ exports.default = function (location, callback) {
       var rerr = new Error('match({ location: ' + location + ' }): renderProps is missing');
       rerr.statusCode = 404;
       return callback(rerr);
+    }
+
+    // StaticRendering
+    if (_path2.default.extname(location) === '.html') {
+      return callback(null, renderToString(store, renderProps));
     }
 
     var components = renderProps.components.filter(function (component) {
@@ -99,13 +104,17 @@ function createRequest(component) {
 }
 
 function renderToString(store, router) {
+  if (revisions === null) {
+    revisions = require('../app-revisions.json');
+  }
+
   var el = (0, _react.createElement)(_App2.default, { store: store, router: router });
   var appHtml = _server2.default.renderToString(el);
 
   var chunkNames = (0, _getChunkNames2.default)(router.location);
-  var stylesheets = ['<link href="' + _config2.default.rootdir + revisions[appName + '.css'] + '" rel="stylesheet" />'];
-  var javascripts = ['<script src="' + _config2.default.rootdir + revisions[appName + '.js'] + '"></script>'].concat(chunkNames.map(function (chunkName) {
-    return '<script src="' + _config2.default.rootdir + revisions[chunkName + '.js'] + '"></script>';
+  var stylesheets = ['<link href="' + _config2.default.publicPath + revisions[appName + '.css'] + '" rel="stylesheet" />'];
+  var javascripts = ['<script src="' + _config2.default.publicPath + revisions[appName + '.js'] + '"></script>'].concat(chunkNames.map(function (chunkName) {
+    return '<script src="' + _config2.default.publicPath + revisions[chunkName + '.js'] + '"></script>';
   })).concat(['<script>window[' + JSON.stringify(appName) + '](' + JSON.stringify(store.getState()) + ');</script>']);
   if (process.env.NODE_ENV === 'development') {
     javascripts.push('<script src="/webpack-dev-server.js"></script>');
