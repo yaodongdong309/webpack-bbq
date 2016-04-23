@@ -322,50 +322,41 @@ NamedStats.prototype.apply = function(compiler) {
 function StaticRendering(config, server) {
   this.config = xtend({ rootdir: '/' }, config);
   this.server = server;
-  this.logger = config.logger || console;
 }
 StaticRendering.prototype.apply = function (compiler) {
-  const self = this;
-  let logs;
-  compiler.plugin('after-compile', (compilation, callback) => run(callback));
-  compiler.plugin('done', function(stats) {
-    const toString = stats.toString;
-    stats.toString = function(options) {
-      const bold = makeBold(defined(options.colors, false));
-      const srlogs = logs.map((log) => `${log[0]}: ${bold(log[1])}`).join('\n');
-      return `${toString.apply(this, arguments)}\n${srlogs}`;
-    };
-  });
+  const config = this.config;
+  const entry = get(this.server.entry[Object.keys(this.server.entry)[0]]);
+  const staticRendering = this.server.staticRendering;
 
-  function run(done) {
-    logs = [];
-    const config = self.config;
-    let entry;
-    entry = self.server.entry[Object.keys(self.server.entry)[0]];
-    entry = get(entry);
-    clearRequireCache(entry);
-
+  compiler.plugin('after-compile', function afterCompile(compilation, callback) {
+    if (process.env.NODE_ENV === 'development') {
+      clearRequireCache(entry);
+    }
     let app; 
-    try { app = require(entry); } catch(err) { return done(err); }
+    try { app = require(entry); } catch(err) { return callback(err); }
     if (typeof app !== 'function') {
-      return done(new Error('server.entry MUST BE a function'));
+      return callback(new Error('server.entry MUST BE a function'));
     }
     if (app.length !== 2) {
-      return done(new Error('server.entry MUST BE compatible with the style: (props, cb) => cb(null, html)'));
+      return callback(new Error('server.entry MUST BE (uri, cb) => cb(err, html)'));
     }
 
-    map(self.server.staticRendering, (uri, cb) => {
+    map(staticRendering, (uri, cb) => {
       const filepath = `${config.outputdir}${uri.slice(config.rootdir.length - 1)}`;
       compiler.outputFileSystem.mkdirp(path.dirname(filepath), (err) => {
         if (err) return cb(err);
         app(uri, (err, html) => {
           if (err) return cb(err);
-          logs.push(['StaticRendering', uri]);
+          compilation.assets[uri.slice(config.rootdir.length)] = {
+            source: () => html,
+            size: () => html.length,
+            emitted: true,
+          };
           compiler.outputFileSystem.writeFile(filepath, html, cb);
         });
       });
-    }, done);
-  }
+    }, callback);
+  });
 };
 
 function get(file) {

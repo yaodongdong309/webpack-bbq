@@ -11,17 +11,17 @@ if (process.env.NODE_ENV === 'production') {
   server.listen(port + 1, 'localhost', function() {
     console.info(`server is listening at ${JSON.stringify(this.address())}`);
   });
+
   const WebpackDevServer = require('webpack-dev-server');
   const webpack = require('webpack');
 
   const config = require('../config');
   const webpackConfig = require('../webpack.config');
-
-  const compiler = webpack(webpackConfig[0]);
   const statsOptions = {
     colors: { level: 1, hasBasic: true, has256: false, has16m: false },
     cached: false,
     cachedAssets: false,
+    assets: true,
     modules: false,
     chunks: false,
     reasons: false,
@@ -29,11 +29,7 @@ if (process.env.NODE_ENV === 'production') {
     chunkOrigins: false,
     publicPath: true,
   };
-  const libpack = webpack(webpackConfig[1]);
-  libpack.watch({}, (err, stats) => {
-    if (err) console.error(err);
-    else console.info(stats.toString(statsOptions));
-  });
+  const compiler = webpack(webpackConfig[0]);
   const devServer = new WebpackDevServer(compiler, {
     contentBase: config.outputdir,
     hot: true,
@@ -43,8 +39,14 @@ if (process.env.NODE_ENV === 'production') {
     publicPath: config.publicPath,
     stats: statsOptions,
   });
-  libpack.outputFileSystem = devServer.middleware.fileSystem;
   devServer.listen(port, 'localhost', function() {
     console.info(`dev server is listening at ${JSON.stringify(this.address())}`);
+  });
+
+  const libpack = webpack(webpackConfig[1]);
+  libpack.outputFileSystem = devServer.middleware.fileSystem;
+  libpack.watch({}, (err, stats) => {
+    if (err) console.error(err);
+    else console.info(stats.toString(statsOptions));
   });
 }
