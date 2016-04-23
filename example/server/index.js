@@ -1,14 +1,15 @@
+/* eslint global-require:0 */
 'use strict';
 
 const server = require('./server');
 const port = require('./port');
 
 if (process.env.NODE_ENV === 'production') {
-  server.listen(port, function() {
+  server.listen(port, function () {
     console.info(`server is listening at ${JSON.stringify(this.address())}`);
   });
 } else {
-  server.listen(port + 1, 'localhost', function() {
+  server.listen(port + 1, 'localhost', function () {
     console.info(`server is listening at ${JSON.stringify(this.address())}`);
   });
 
@@ -39,7 +40,7 @@ if (process.env.NODE_ENV === 'production') {
     publicPath: config.publicPath,
     stats: statsOptions,
   });
-  devServer.listen(port, 'localhost', function() {
+  devServer.listen(port, 'localhost', function () {
     console.info(`dev server is listening at ${JSON.stringify(this.address())}`);
   });
 

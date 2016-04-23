@@ -1,8 +1,8 @@
+/* eslint global-require:0 */
 'use strict';
 const http = require('http');
 const sendHtml = require('send-data/html');
 
-const port = require('./port');
 const config = require('../config');
 const routerpath = require.resolve('./router');
 let router = require(routerpath);
@@ -28,6 +28,7 @@ const server = http.createServer((req, res) => {
   }
 
   router(req, res, {}, (err) => {
+    /* eslint no-param-reassign:0 */
     if (err) {
       console.error(req.url, err.stack || err.toString());
       if (res.finished) {

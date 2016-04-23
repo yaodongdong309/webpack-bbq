@@ -17,7 +17,7 @@ export default (initialState) => {
   }));
 
   const store = createStore(rootReducer, initialState, compose(
-    applyMiddleware(thunkMiddleware, routerMiddleware(history)),
+    applyMiddleware(thunkMiddleware, routerMiddleware(browserHistory)),
     // https://github.com/zalmoxisus/redux-devtools-extension
     // https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd
     window.devToolsExtension ? window.devToolsExtension() : askForReduxDevTools

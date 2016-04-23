@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import xhrRequest from 'xhr-request';
 import { connect } from 'react-redux';
 
-const fetchPeanutFoo = ({ request, dispatch, headers }, cb = null) => {
+const fetchPeanutFoo = ({ request, dispatch, headers }, cb = (err) => (err)) => {
   request('/api/peanut/-/foo', { json: true, headers }, (err, payload) => {
     const action = {};
     if (err) {
@@ -14,7 +14,7 @@ const fetchPeanutFoo = ({ request, dispatch, headers }, cb = null) => {
       action.payload = payload.foo;
     }
     dispatch(action);
-    if (cb) cb();
+    cb(err);
   });
 };
 
@@ -48,12 +48,17 @@ class PeaNut extends Component {
     const { foo } = this.props;
     return (
       <div onClick={this.handleClick}>
-        I am a PeaNut<br/>Click Me!
+        I am a PeaNut<br />Click Me!
         <p>foo: {foo}</p>
       </div>
     );
   }
 }
+
+PeaNut.propTypes = {
+  foo: PropTypes.string,
+  dispatch: PropTypes.func.isRequired,
+};
 
 PeaNut.getInitialData = fetchPeanutFoo;
 

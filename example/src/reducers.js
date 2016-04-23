@@ -5,7 +5,7 @@ const identityReducer = (state = 'index') => state;
 const errorsReducer = (state = [], action) => {
   if (action.error === true) {
     state.push(action.payload);
-  };
+  }
   return state;
 };
 

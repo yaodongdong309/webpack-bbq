@@ -1,13 +1,11 @@
+/* eslint no-use-before-define:0 */
 'use strict';
 const qs = require('querystring');
-const fs = require('fs');
 const path = require('path');
 
 const defined = require('defined');
 const xtend = require('xtend');
 const map = require('map-async');
-const warning = require('warning');
-const mkdirp = require('mkdirp');
 const resolve = require('resolve');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -44,10 +42,10 @@ const bbq = (config) => (client, server) => {
   server.context = context;
 
   const getEntry = (id) => {
-    const filepath = resolve.sync(id, { basedir: config.basedir })
+    const filepath = resolve.sync(id, { basedir: config.basedir });
     const appName = expose(filepath, `${config.basedir}/src/`);
     return { [appName]: filepath };
-  }
+  };
 
   // 主文件 (entry)
   // 通过 ${basedir}/src/ 获取主文件，index.js ？是否会有其他的可能？
@@ -123,7 +121,7 @@ const bbq = (config) => (client, server) => {
     plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true));
     plugins.push(new webpack.optimize.UglifyJsPlugin({
       compress: {
-        warnings: false
+        warnings: false,
       },
     }));
   }
@@ -171,7 +169,7 @@ const bbq = (config) => (client, server) => {
       babelquery['plugins[]'].push('transform-ensure-ignore');
     }
     babelquery = qs.stringify(babelquery, null, null, {
-      encodeURIComponent: (s) => (s)
+      encodeURIComponent: (s) => (s),
     });
     const jsLoader = {
       test: /\.js$/,
@@ -188,7 +186,7 @@ const bbq = (config) => (client, server) => {
         ExtractTextPlugin.extract('style-loader', 'css-loader').split('!') :
         [csslocals],
     };
-    const globalCssRe = /\.global\.css$/
+    const globalCssRe = /\.global\.css$/;
     const globalCssLoader = {
       test: globalCssRe,
       include: `${config.basedir}/src/`,
@@ -253,7 +251,7 @@ const bbq = (config) => (client, server) => {
 
 
   // server land
-  
+
   const postLoaders = [{ loader: libify }];
 
   // configuration - target
@@ -308,11 +306,18 @@ ShouldNotEmit.prototype.apply =
   (compiler) => compiler.plugin('should-emit', () => false);
 
 function NamedStats() {}
-NamedStats.prototype.apply = function(compiler) {
-  compiler.plugin('done', function(stats) {
+function makeBold(useColors) {
+  return (str) => {
+    if (useColors) return `\u001b[1m${str}\u001b[22m`;
+    return str;
+  };
+}
+NamedStats.prototype.apply = function (compiler) {
+  compiler.plugin('done', (stats) => {
     const toString = stats.toString;
-    stats.toString = function(options) {
-      const bold = makeBold(defined(options.colors, false))
+    stats.toString = function (options) {
+      /* eslint prefer-rest-params:0 */
+      const bold = makeBold(defined(options.colors, false));
       const name = this.compilation.options.name;
       return `Compiler Name: ${bold(name)}\n${toString.apply(this, arguments)}`;
     };
@@ -323,30 +328,48 @@ function StaticRendering(config, server) {
   this.config = xtend({ rootdir: '/' }, config);
   this.server = server;
 }
+StaticRendering.prototype.get = function (srcfile) {
+  const ext = path.extname(srcfile);
+  let libfile = srcfile.replace('/src/', '/lib/');
+  if (ext === '' || (ext !== '.js' && ext !== '.json')) {
+    libfile = `${libfile}.js`;
+  }
+  return libfile;
+};
 StaticRendering.prototype.apply = function (compiler) {
   const config = this.config;
-  const entry = get(this.server.entry[Object.keys(this.server.entry)[0]]);
+  const entry = this.get(this.server.entry[Object.keys(this.server.entry)[0]]);
   const staticRendering = this.server.staticRendering;
 
-  compiler.plugin('after-compile', function afterCompile(compilation, callback) {
+  compiler.plugin('after-compile', (compilation, callback) => {
     if (process.env.NODE_ENV === 'development') {
       clearRequireCache(entry);
     }
-    let app; 
-    try { app = require(entry); } catch(err) { return callback(err); }
+    let app;
+    /* eslint global-require:0 */
+    try { app = require(entry); } catch (err) { callback(err); return; }
     if (typeof app !== 'function') {
-      return callback(new Error('server.entry MUST BE a function'));
+      callback(new Error('server.entry MUST BE a function'));
+      return;
     }
     if (app.length !== 2) {
-      return callback(new Error('server.entry MUST BE (uri, cb) => cb(err, html)'));
+      callback(new Error('server.entry MUST BE (uri, cb) => cb(err, html)'));
+      return;
     }
 
     map(staticRendering, (uri, cb) => {
       const filepath = `${config.outputdir}${uri.slice(config.rootdir.length - 1)}`;
       compiler.outputFileSystem.mkdirp(path.dirname(filepath), (err) => {
-        if (err) return cb(err);
-        app(uri, (err, html) => {
-          if (err) return cb(err);
+        if (err) {
+          cb(err);
+          return;
+        }
+        app(uri, (apperr, html) => {
+          if (apperr) {
+            cb(apperr);
+            return;
+          }
+          /* eslint no-param-reassign:0 */
           compilation.assets[uri.slice(config.rootdir.length)] = {
             source: () => html,
             size: () => html.length,
@@ -359,26 +382,10 @@ StaticRendering.prototype.apply = function (compiler) {
   });
 };
 
-function get(file) {
-  const ext = path.extname(file);
-  file = file.replace('/src/', '/lib/');
-  if (ext === '' || (ext !== '.js' && ext !== '.json')) {
-    file = file + '.js';
-  }
-  return file;
-}
-
 function expose(filename, basedir) {
   const extname = path.extname(filename);
   const relname = path.relative(basedir, filename);
   return path.join(path.dirname(relname), path.basename(relname, extname));
-}
-
-function makeBold(useColors) {
-  return (str) => {
-    if (useColors) return `\u001b[1m${str}\u001b[22m`;
-    else return str;
-  };
 }
 
 bbq.NamedStats = NamedStats;

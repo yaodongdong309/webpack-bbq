@@ -1,10 +1,10 @@
-const path = require('path');
+const postcssNesting = require('postcss-nesting');
 
 const config = require('./config');
 
 module.exports = require('../')(config)({
   entry: require.resolve('./src/client'),
-  postcss: () => [require('postcss-nesting')],
+  postcss: () => [postcssNesting],
 }, {
   entry: require.resolve('./src/server'),
   staticRendering: [

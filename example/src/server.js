@@ -1,3 +1,4 @@
+/* eslint no-use-before-define:0 */
 import path from 'path';
 import { createElement } from 'react';
 import ReactDOMServer from 'react-dom/server';
@@ -24,42 +25,53 @@ export default (location, callback) => {
 
   match({ location, routes }, (err, redirectLocation, renderProps) => {
     if (err) {
-      return callback(err);
+      callback(err);
+      return;
     }
     if (redirectLocation) {
-      return callback(new Error(`redirectLocation: ${redirectLocation}`));
+      callback(new Error(`redirectLocation: ${redirectLocation}`));
+      return;
     }
     if (!renderProps) {
       const rerr = new Error(`match({ location: ${location} }): renderProps is missing`);
       rerr.statusCode = 404;
-      return callback(rerr);
+      callback(rerr);
+      return;
     }
 
     // StaticRendering
     if (path.extname(location) === '.html') {
-      return callback(null, renderToString(store, renderProps));
+      callback(null, renderToString(store, renderProps));
+      return;
     }
 
     const components = renderProps.components
     .filter(component => (typeof component.getInitialData === 'function'));
     map(components, (component, cb) => {
-      const request = createRequest(component);
+      const injectedRequest = createRequest(component);
       component.getInitialData({
-        request,
-        dispatch: store.dispatch
-      }, cb);
-    }, (err) => {
-      callback(null, renderToString(store, renderProps));
+        request: injectedRequest,
+        dispatch: store.dispatch,
+      }, (loadErr) => {
+        /* eslint no-param-reassign:0 */
+        if (loadErr) {
+          loadErr.component = component;
+        }
+        cb(loadErr);
+      });
+    }, (mapLoadErr) => {
+      callback(mapLoadErr, renderToString(store, renderProps));
     });
   });
 };
 
-function createRequest(component) {
-  const host = `http://localhost:8080`;
+function createRequest() {
+  const host = 'http://localhost:8080';
   return (api, opts, cb) => request(`${host}${api}`, opts, cb);
 }
 
 function renderToString(store, router) {
+  /* eslint global-require:0 */
   if (revisions === null) {
     revisions = require('../app-revisions.json');
   }
@@ -81,7 +93,7 @@ function renderToString(store, router) {
     `<script>window[${JSON.stringify(appName)}](${JSON.stringify(store.getState())});</script>`,
   ]);
   if (process.env.NODE_ENV === 'development') {
-    javascripts.push(`<script src="/webpack-dev-server.js"></script>`);
+    javascripts.push('<script src="/webpack-dev-server.js"></script>');
   }
 
   const html = `<!doctype html>

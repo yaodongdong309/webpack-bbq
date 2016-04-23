@@ -1,6 +1,7 @@
 import path from 'path';
-import React from 'react';
+import React, { PropTypes } from 'react';
 import Link from 'react-router/lib/Link';
+
 import { rootdir } from '../config';
 
 const getHref = (pathname) => {
@@ -14,7 +15,7 @@ const getHref = (pathname) => {
 
 const WebIndexRoute = (props) => (
   <div>
-    <p><a href={`https://github.com/wenbing/webpack-bbq`}>webpack-bbq</a></p>
+    <p><a href={'https://github.com/wenbing/webpack-bbq'}>webpack-bbq</a></p>
     <pre>props.location: {JSON.stringify(props.location, (key, value) => {
       if (key === 'key') return undefined;
       return value;
@@ -23,5 +24,10 @@ const WebIndexRoute = (props) => (
     {props.children}
   </div>
 );
+
+WebIndexRoute.propTypes = {
+  location: PropTypes.object,
+  children: PropTypes.element,
+};
 
 export default WebIndexRoute;

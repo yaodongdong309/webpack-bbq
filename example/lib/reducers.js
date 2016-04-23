@@ -13,7 +13,7 @@ var errorsReducer = function errorsReducer() {
 
   if (action.error === true) {
     state.push(action.payload);
-  };
+  }
   return state;
 };
 

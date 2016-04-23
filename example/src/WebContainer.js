@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 
 import styles from './index.css';
 
@@ -8,5 +8,9 @@ const WebContaner = (props) => (
     {props.children}
   </div>
 );
+
+WebContaner.propTypes = {
+  children: PropTypes.element,
+};
 
 export default WebContaner;

@@ -1,3 +1,4 @@
+/* eslint global-require:0 */
 import httpHash from 'http-hash';
 import { rootdir } from '../config';
 

@@ -4,7 +4,7 @@
   "description": "webpack your bbq",
   "main": "index.js",
   "scripts": {
-    "test": "node test/ | faucet"
+    "test": "eslint . --fix && node test/ | faucet"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,11 @@
   "devDependencies": {
     "basscss": "^8.0.1",
     "bootstrap": "^3.3.6",
+    "eslint": "^2.8.0",
+    "eslint-config-airbnb": "^8.0.0",
+    "eslint-plugin-import": "^1.5.0",
+    "eslint-plugin-jsx-a11y": "^1.0.2",
+    "eslint-plugin-react": "^5.0.1",
     "faucet": "0.0.1",
     "http-hash": "^2.0.0",
     "http-hash-mocker": "^1.1.2",

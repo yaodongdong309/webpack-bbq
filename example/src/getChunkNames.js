@@ -18,6 +18,6 @@ const getChunkNames = (location) => {
     chunkNames.push('peanut');
   }
   return chunkNames;
-}
+};
 
 export default getChunkNames;

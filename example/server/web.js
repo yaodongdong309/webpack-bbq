@@ -1,3 +1,4 @@
+/* eslint global-require:0 */
 'use strict';
 const sendHtml = require('send-data/html');
 
@@ -9,7 +10,8 @@ module.exports = (req, res, opts, cb) => {
   }
   app(req.url, (err, html) => {
     if (err) {
-      return cb(err);
+      cb(err);
+      return;
     }
     sendHtml(req, res, html, cb);
   });
