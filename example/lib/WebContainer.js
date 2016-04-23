@@ -1,6 +1,6 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
@@ -25,6 +25,10 @@ var WebContaner = function WebContaner(props) {
     ),
     props.children
   );
+};
+
+WebContaner.propTypes = {
+  children: _react.PropTypes.element
 };
 
 exports.default = WebContaner;

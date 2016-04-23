@@ -45,6 +45,7 @@ var routes = [{
   getChildRoutes: function getChildRoutes(location, callback) {
     callback(null, require('./peanut.routes'));
   }
-}];
+}]; /* eslint global-require:0 */
+
 
 module.exports = routes;

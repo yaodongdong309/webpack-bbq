@@ -41,7 +41,7 @@ if (process.env.NODE_ENV === 'production') {
     stats: statsOptions,
   });
   devServer.listen(port, 'localhost', function () {
-    console.info(`dev server is listening at ${JSON.stringify(this.address())}`);
+    console.info(`webpack dev server is listening at ${JSON.stringify(this.address())}`);
   });
 
   const libpack = webpack(webpackConfig[1]);

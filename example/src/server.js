@@ -13,6 +13,7 @@ import App from './App';
 import routes from './routes';
 import reducers from './reducers';
 import getChunkNames from './getChunkNames';
+import port from '../server/port';
 
 const rootReducer = combineReducers(reducers);
 const storeEnhancer = applyMiddleware(thunkMiddleware);
@@ -66,7 +67,7 @@ export default (location, callback) => {
 };
 
 function createRequest() {
-  const host = 'http://localhost:8080';
+  const host = `http://localhost:${port}`;
   return (api, opts, cb) => request(`${host}${api}`, opts, cb);
 }
 
@@ -92,9 +93,6 @@ function renderToString(store, router) {
   .concat([
     `<script>window[${JSON.stringify(appName)}](${JSON.stringify(store.getState())});</script>`,
   ]);
-  if (process.env.NODE_ENV === 'development') {
-    javascripts.push('<script src="/webpack-dev-server.js"></script>');
-  }
 
   const html = `<!doctype html>
 <html>

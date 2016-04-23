@@ -1,6 +1,6 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
@@ -62,6 +62,11 @@ var WebIndexRoute = function WebIndexRoute(props) {
     ),
     props.children
   );
+};
+
+WebIndexRoute.propTypes = {
+  location: _react.PropTypes.object,
+  children: _react.PropTypes.element
 };
 
 exports.default = WebIndexRoute;

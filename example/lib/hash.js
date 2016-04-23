@@ -1,6 +1,6 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
@@ -11,6 +11,9 @@ var _httpHash2 = _interopRequireDefault(_httpHash);
 var _config = require('../config');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* eslint global-require:0 */
+
 
 var hash = (0, _httpHash2.default)();
 

@@ -1,6 +1,6 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
@@ -52,7 +52,14 @@ var _getChunkNames = require('./getChunkNames');
 
 var _getChunkNames2 = _interopRequireDefault(_getChunkNames);
 
+var _port = require('../server/port');
+
+var _port2 = _interopRequireDefault(_port);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* eslint no-use-before-define:0 */
+
 
 var rootReducer = (0, _redux.combineReducers)(_reducers2.default);
 var storeEnhancer = (0, _redux.applyMiddleware)(_reduxThunk2.default);
@@ -65,45 +72,56 @@ exports.default = function (location, callback) {
 
   (0, _match2.default)({ location: location, routes: _routes2.default }, function (err, redirectLocation, renderProps) {
     if (err) {
-      return callback(err);
+      callback(err);
+      return;
     }
     if (redirectLocation) {
-      return callback(new Error('redirectLocation: ' + redirectLocation));
+      callback(new Error('redirectLocation: ' + redirectLocation));
+      return;
     }
     if (!renderProps) {
       var rerr = new Error('match({ location: ' + location + ' }): renderProps is missing');
       rerr.statusCode = 404;
-      return callback(rerr);
+      callback(rerr);
+      return;
     }
 
     // StaticRendering
     if (_path2.default.extname(location) === '.html') {
-      return callback(null, renderToString(store, renderProps));
+      callback(null, renderToString(store, renderProps));
+      return;
     }
 
     var components = renderProps.components.filter(function (component) {
       return typeof component.getInitialData === 'function';
     });
     (0, _mapAsync2.default)(components, function (component, cb) {
-      var request = createRequest(component);
+      var injectedRequest = createRequest(component);
       component.getInitialData({
-        request: request,
+        request: injectedRequest,
         dispatch: store.dispatch
-      }, cb);
-    }, function (err) {
-      callback(null, renderToString(store, renderProps));
+      }, function (loadErr) {
+        /* eslint no-param-reassign:0 */
+        if (loadErr) {
+          loadErr.component = component;
+        }
+        cb(loadErr);
+      });
+    }, function (mapLoadErr) {
+      callback(mapLoadErr, renderToString(store, renderProps));
     });
   });
 };
 
-function createRequest(component) {
-  var host = 'http://localhost:8080';
+function createRequest() {
+  var host = 'http://localhost:' + _port2.default;
   return function (api, opts, cb) {
     return (0, _xhrRequest2.default)('' + host + api, opts, cb);
   };
 }
 
 function renderToString(store, router) {
+  /* eslint global-require:0 */
   if (revisions === null) {
     revisions = require('../app-revisions.json');
   }
@@ -116,9 +134,6 @@ function renderToString(store, router) {
   var javascripts = ['<script src="' + _config2.default.publicPath + revisions[appName + '.js'] + '"></script>'].concat(chunkNames.map(function (chunkName) {
     return '<script src="' + _config2.default.publicPath + revisions[chunkName + '.js'] + '"></script>';
   })).concat(['<script>window[' + JSON.stringify(appName) + '](' + JSON.stringify(store.getState()) + ');</script>']);
-  if (process.env.NODE_ENV === 'development') {
-    javascripts.push('<script src="/webpack-dev-server.js"></script>');
-  }
 
   var html = '<!doctype html>\n<html>\n  <head>\n    <meta charset="utf-8" />\n    <title>webpack-bbq</title>\n    ' + stylesheets.join('\n    ') + '\n  </head>\n  <body>\n    <div id="' + appName + '">' + appHtml + '</div>\n    ' + javascripts.join('\n    ') + '\n  </body>\n</html>\n  ';
   return html;

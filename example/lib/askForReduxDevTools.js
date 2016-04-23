@@ -1,7 +1,7 @@
 /* eslint strict:0 */
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var askForDevTools = void 0;

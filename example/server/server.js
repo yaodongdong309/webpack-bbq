@@ -3,6 +3,7 @@
 const http = require('http');
 const sendHtml = require('send-data/html');
 
+const port = require('./port');
 const config = require('../config');
 const routerpath = require.resolve('./router');
 let router = require(routerpath);
@@ -45,3 +46,9 @@ const server = http.createServer((req, res) => {
 });
 
 module.exports = server;
+
+if (require.main === module) {
+  server.listen(port, 'localhost', function () {
+    console.info(`server is listening at ${JSON.stringify(this.address())}`);
+  });
+}
