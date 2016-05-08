@@ -253,8 +253,6 @@ const bbq = (config) => (client, server) => {
 
   // server land
 
-  const postLoaders = [{ loader: libify }];
-
   // configuration - target
   // server only
   server.target = 'node';
@@ -271,7 +269,9 @@ const bbq = (config) => (client, server) => {
     loaders: getLoaders('node').concat(
       server.module && server.module.loaders
     ).filter(v => v),
-    postLoaders,
+    postLoaders: [{ loader: libify }].concat(
+      server.module && server.module.postLoaders
+    ).filter(v => v),
   });
 
   // configuration - plugins
