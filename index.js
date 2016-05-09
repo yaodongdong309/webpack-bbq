@@ -157,7 +157,7 @@ const bbq = (config) => (client, server) => {
       loader: urlLoader,
     };
     const imagesLoader = {
-      test: /\.(png|jpg)$/,
+      test: /\.(png|jpg|ico)$/,
       loader: `${urlLoader}&limit=25000`,
     };
 
