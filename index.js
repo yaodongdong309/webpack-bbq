@@ -140,13 +140,6 @@ const bbq = (config) => (client, server) => {
   // get loaders for specified target
   // supported targets: web, node
   const getLoaders = (target) => {
-    const exposeEntryLoaders = Object
-    .keys(client.entry)
-    .map(name => ({
-      test: resolve.sync(client.entry[name], { basedir: config.basedir }),
-      loader: `expose-loader?${name}`,
-    }));
-
     const urlLoader = `url-loader?name=${bundlename}`;
     const svgLoader = {
       test: /\.(svg)/,
@@ -224,9 +217,6 @@ const bbq = (config) => (client, server) => {
       fontLoader,
       imagesLoader,
     ];
-    if (target === 'web') {
-      return exposeEntryLoaders.concat(loaders);
-    }
     return loaders;
   };
 
@@ -237,6 +227,18 @@ const bbq = (config) => (client, server) => {
       client.module && client.module.loaders
     ).filter(v => v),
   });
+
+  const exposeEntryLoaders = Object
+  .keys(client.entry)
+  .map(name => ({
+    test: resolve.sync(client.entry[name], { basedir: config.basedir }),
+    loader: `expose-loader?${name}`,
+  }));
+  if (client.module.postLoaders) {
+    client.module.postLoaders = exposeEntryLoaders.concat(client.module.postLoaders).filter(v => v);
+  } else {
+    client.module.postLoaders = exposeEntryLoaders;
+  }
 
   // output
   const output = xtend(client.output, {
